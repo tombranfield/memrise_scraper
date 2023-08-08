@@ -10,16 +10,9 @@ page = urlopen(url)
 html = page.read().decode("utf-8")
 soup = BeautifulSoup(html, "html.parser")
 
-print(soup.title.string)
-
-
 results = soup.find_all(lambda tag: tag.name == "div" and
                                     tag.get("class") == ["text"])
 
-
-
-print(results)
-
-
-
-#print(my_divs)
+it = iter(results)
+for element in it:
+    print(element.text, next(it).text)

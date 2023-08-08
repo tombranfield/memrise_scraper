@@ -7,7 +7,12 @@ from urllib.request import urlopen
 import sys
 
 from PyQt5 import QtWidgets, uic
-from PyQt5.QtWidgets import QApplication, QMainWindow
+from PyQt5.QtWidgets import (
+    QApplication, 
+    QFileDialog, 
+    QMainWindow,
+    QMessageBox,
+)
 
 
 class MemriseScraper(QMainWindow):
@@ -22,7 +27,7 @@ class MemriseScraper(QMainWindow):
     def connect_widgets(self):
         self.url_entry.textChanged.connect(self.url_entry_changed)
         self.clear_button.clicked.connect(self.clear_url)
-#        self.browse_button
+        self.browse_button.clicked.connect(self.choose_output_filename)
 #        self.output_filename_label
 #        self.separator_box
 
@@ -36,6 +41,14 @@ class MemriseScraper(QMainWindow):
         print("clearing")
         self.url = ""
         self.url_entry.setText("")
+
+    def choose_output_filename(self):
+        initial_dir = str(Path.home())
+        self.output_filename = QFileDialog.getSaveFileName(
+            self,
+            "Save File As",
+        )[0]
+        print(self.output_filename)
 
     def scrape(self):
         """Scrapes the words from the given url"""

@@ -21,16 +21,24 @@ class MemriseScraper(QMainWindow):
         uic.loadUi(str(Path(__file__).parents[0] / "memrise_scraper.ui"), self)
         self.url = ""
         self.separator = ","
-        self.out_filename = ""
+        self.output_filename = ""
         self.connect_widgets()
+        self.refresh_widgets()
 
     def connect_widgets(self):
         self.url_entry.textChanged.connect(self.url_entry_changed)
         self.clear_button.clicked.connect(self.clear_url)
         self.browse_button.clicked.connect(self.choose_output_filename)
-#        self.output_filename_label
 #        self.separator_box
 
+    def refresh_widgets(self):
+        self.refresh_filename_label()
+
+    def refresh_filename_label(self):
+        if not self.output_filename:
+            self.output_filename_label.setText("")
+        else:
+            self.output_filename_label.setText(self.output_filename)
 
     def url_entry_changed(self, url_entry_string):
         self.url = url_entry_string
@@ -48,7 +56,7 @@ class MemriseScraper(QMainWindow):
             self,
             "Save File As",
         )[0]
-        print(self.output_filename)
+        self.refresh_filename_label()
 
     def scrape(self):
         """Scrapes the words from the given url"""

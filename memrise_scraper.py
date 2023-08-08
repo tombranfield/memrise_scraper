@@ -20,13 +20,14 @@ class MemriseScraper(QMainWindow):
         uic.loadUi(str(Path(__file__).parents[0] / "memrise_scraper.ui"), self)
         self.setStyleSheet(open(str(Path("stylesheet.css"))).read())
         self.url = ""
-        self.separator = self.separator_box.currentText()
         self.output_filename = ""
         self.word_pairs = []
-        self.connect_widgets()
+        self.setup_widgets()
         self.refresh_widgets()
 
-    def connect_widgets(self):
+    def setup_widgets(self):
+        self.separator = self.separator_box.currentText()
+        self.status_label.setText("")
         self.url_entry.textChanged.connect(self.url_entry_changed)
         self.clear_button.clicked.connect(self.clear_url)
         self.browse_button.clicked.connect(self.choose_output_filename)
@@ -43,7 +44,7 @@ class MemriseScraper(QMainWindow):
             self.output_filename_label.setText("")
         else:
             self.output_filename_label.setText(self.output_filename)
-        
+
     def refresh_insert_button(self):
         if not (self.output_filename and self.url):
             self.insert_button.setEnabled(False)
@@ -71,6 +72,7 @@ class MemriseScraper(QMainWindow):
         self.refresh_insert_button()
         self.separator_box.setCurrentIndex(0)
         self.word_pairs = []
+        self.status_label.setText("")
 
     def choose_output_filename(self):
         initial_dir = str(Path.home())
@@ -117,7 +119,9 @@ class MemriseScraper(QMainWindow):
                 num_words_after = len(self.word_pairs)
                 if num_words_before == num_words_after:
                     return
-                print("Scraping page", current_page)
+#                print("Scraping page", current_page)
+                msg = "Scraping page " + str(current_page)
+                self.status_label.setText(msg)
                 current_page += 1
 
     def scrape_individual_page(self, url):

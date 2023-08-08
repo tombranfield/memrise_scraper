@@ -4,10 +4,9 @@
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
 
-from word_pair import WordPair
-
 # Want to choose URL
-# Want to choose seperator
+
+# Want to choose seperator (for output file)
 # Choose output file name and location
 
 url = "https://app.memrise.com/course/2158097/chemistry-of-rocks-and-minerals/"
@@ -20,13 +19,11 @@ results = soup.find_all(lambda tag: tag.name == "div" and
 
 word_pairs = []
 
+
 it = iter(results)
 for element in it:
-    print(element.text, next(it).text)
     tested_word = element.text
     english_word = next(it).text
-    word_pair = WordPair(tested_word, english_word)
     word_pairs.append((tested_word, english_word))
-
 
 print(word_pairs)

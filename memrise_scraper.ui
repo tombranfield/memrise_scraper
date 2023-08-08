@@ -141,12 +141,12 @@
           <widget class="QComboBox" name="separator_box">
            <item>
             <property name="text">
-             <string>,</string>
+             <string>|</string>
             </property>
            </item>
            <item>
             <property name="text">
-             <string>|</string>
+             <string>,</string>
             </property>
            </item>
           </widget>

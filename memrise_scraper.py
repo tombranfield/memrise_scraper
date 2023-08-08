@@ -4,7 +4,11 @@
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
 
-# Will provide a means to enter a URL later... for now, just testing
+
+# Want to choose URL
+# Want to choose seperator
+# Choose output file name and location
+
 url = "https://app.memrise.com/course/2158097/chemistry-of-rocks-and-minerals/"
 page = urlopen(url)
 html = page.read().decode("utf-8")

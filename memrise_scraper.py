@@ -103,14 +103,18 @@ class MemriseScraper(QMainWindow):
         except ValueError:
             raise ValueError
         else:
+            if len(self.word_pairs) > 0: 
+                return
             current_page = 1
-            multipage_url = url
-            while current_page < 10:
+            while True:
                 new_url = url + "/" + str(current_page) + "/"
-                try:
-                    self.scrape_individual_page(new_url)
-                except:
-                    return    # Run out of pages to scrape
+                num_words_before = len(self.word_pairs)
+                self.scrape_individual_page(new_url)
+                num_words_after = len(self.word_pairs)
+                if num_words_before == num_words_after:
+                    return
+                print("Scraping page", current_page)
+                if current_page > 100: return
                 else:
                     current_page += 1
 
@@ -121,7 +125,6 @@ class MemriseScraper(QMainWindow):
         except ValueError:
             raise ValueError
         else:
-            print("Scraping", url)
             html = page.read().decode("utf-8")
             soup = BeautifulSoup(html, "html.parser")
             results = soup.find_all(lambda tag: tag.name == "div" and

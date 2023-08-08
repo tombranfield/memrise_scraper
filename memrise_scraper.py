@@ -20,7 +20,7 @@ class MemriseScraper(QMainWindow):
         uic.loadUi(str(Path(__file__).parents[0] / "memrise_scraper.ui"), self)
         self.setStyleSheet(open(str(Path("stylesheet.css"))).read())
         self.url = ""
-        self.separator = ","
+        self.separator = self.separator_box.currentText()
         self.output_filename = ""
         self.word_pairs = []
         self.connect_widgets()
@@ -30,7 +30,7 @@ class MemriseScraper(QMainWindow):
         self.url_entry.textChanged.connect(self.url_entry_changed)
         self.clear_button.clicked.connect(self.clear_url)
         self.browse_button.clicked.connect(self.choose_output_filename)
-#TODO        self.separator_box
+        self.separator_box.currentTextChanged.connect(self.separator_changed)
         self.insert_button.clicked.connect(self.insert)
         self.cancel_button.clicked.connect(self.close_window)
 
@@ -61,11 +61,15 @@ class MemriseScraper(QMainWindow):
         self.url = ""
         self.url_entry.setText("")
 
+    def separator_changed(self, separator):
+        self.separator = separator
+
     def reset(self):
         self.clear_url()
         self.output_filename = ""
         self.refresh_filename_label()
         self.refresh_insert_button()
+        self.separator_box.setCurrentIndex(0)
         self.word_pairs = []
 
     def choose_output_filename(self):
@@ -104,7 +108,7 @@ class MemriseScraper(QMainWindow):
             raise ValueError
         else:
             if len(self.word_pairs) > 0: 
-                return
+                return  
             current_page = 1
             while True:
                 new_url = url + "/" + str(current_page) + "/"
@@ -114,9 +118,7 @@ class MemriseScraper(QMainWindow):
                 if num_words_before == num_words_after:
                     return
                 print("Scraping page", current_page)
-                if current_page > 100: return
-                else:
-                    current_page += 1
+                current_page += 1
 
     def scrape_individual_page(self, url):
         """Scrapes the words from the given url"""

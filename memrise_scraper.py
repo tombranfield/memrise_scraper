@@ -60,11 +60,12 @@ class MemriseScraper(QMainWindow):
         self.url = ""
         self.url_entry.setText("")
 
-    def clear_fields(self):
+    def reset(self):
         self.clear_url()
         self.output_filename = ""
         self.refresh_filename_label()
         self.refresh_insert_button()
+        self.word_pairs = []
 
     def choose_output_filename(self):
         initial_dir = str(Path.home())
@@ -76,33 +77,54 @@ class MemriseScraper(QMainWindow):
         self.refresh_insert_button()
 
     def insert(self):
-        word_pairs = self.scrape()
-        self.write_to_file(word_pairs)
-        self.successful_message_box()
-        self.clear_fields()
+        if self.url and self.output_filename:
+            self.scrape_pages()
+            self.write_to_file(self.word_pairs)
+            self.successful_message_box()
+            self.reset()
 
+    def scrape_pages(self):
+        """Attempts scrapes on course homepage and subsequent pages"""
+        try:
+            self.scrape_individual_page(self.url)
+        except ValueError:
+            # It's either a multipage or non-existant
+            current_page = 1
+            while True:
+                url = self.url + str(current_page) + "/"
+                try:
+                    self.scrape_individual_page(url)
+                except ValueError:
+                    if current_page == 1:
+                        raise ValueError
+                    else:
+                        return    # Run out of pages to scrape
+                else:
+                    current_page += 1
+        else:
+            pass    # Nothing more to do for single course pages
 
-    def scrape(self):
+    def scrape_individual_page(self):
         """Scrapes the words from the given url"""
-
-        url = "https://app.memrise.com/course/2158097/chemistry-of-rocks-and-minerals/"
-        page = urlopen(self.url)
-        html = page.read().decode("utf-8")
-        soup = BeautifulSoup(html, "html.parser")
-
-        results = soup.find_all(lambda tag: tag.name == "div" and
+        try:
+            page = urlopen(url)
+        except ValueError:
+            raise ValueError
+        else:
+            html = page.read().decode("utf-8")
+            soup = BeautifulSoup(html, "html.parser")
+            results = soup.find_all(lambda tag: tag.name == "div" and
                                        tag.get("class") == ["text"])
-        word_pairs = []
-        it = iter(results)
-        for element in it:
-            tested_word = element.text
-            english_word = next(it).text
-            word_pairs.append((tested_word, english_word))
-        return word_pairs
+            word_pairs = []
+            it = iter(results)
+            for element in it:
+                tested_word = element.text
+                english_word = next(it).text
+                self.word_pairs.append((tested_word, english_word))
 
-    def write_to_file(self, word_pairs):
+    def write_to_file(self):
         with open(self.output_filename, "w") as out_file:
-            for pair in word_pairs:
+            for pair in self.word_pairs:
                 line = pair[0] + self.separator + pair[1] + "\n"
                 out_file.write(line)
 
@@ -118,7 +140,6 @@ class MemriseScraper(QMainWindow):
 
     def successful_message_box(self):
         title = "Success"
-        filtered_filename = self.filtered_filename()
         message = "Words inserted successfully"
         self.message_box(title, message)
 

@@ -39,7 +39,7 @@
     <item>
      <widget class="QGroupBox" name="groupBox_3">
       <property name="title">
-       <string>URL of course</string>
+       <string>Course Homepage URL</string>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>

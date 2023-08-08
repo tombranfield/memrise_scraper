@@ -19,6 +19,7 @@ class MemriseScraper(QMainWindow):
     def __init__(self):
         super().__init__()
         uic.loadUi(str(Path(__file__).parents[0] / "memrise_scraper.ui"), self)
+        self.setStyleSheet(open(str(Path("stylesheet.css"))).read())
         self.url = ""
         self.separator = ","
         self.output_filename = ""

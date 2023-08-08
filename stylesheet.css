@@ -1,0 +1,10 @@
+.QWidget {
+    background-color: lightblue;
+}
+
+
+QGroupBox {
+    font-family: FreeSans;
+    font-weight: bold;
+    font-size: 18px;
+}

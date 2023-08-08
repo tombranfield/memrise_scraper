@@ -30,7 +30,7 @@ class MemriseScraper(QMainWindow):
         self.clear_button.clicked.connect(self.clear_url)
         self.browse_button.clicked.connect(self.choose_output_filename)
         self.separator_box
-        self.insert_button.clicked.connect(self_insert)
+        self.insert_button.clicked.connect(self.insert)
         self.cancel_button.clicked.connect(self.close_window)
 
     def refresh_widgets(self):
@@ -60,6 +60,12 @@ class MemriseScraper(QMainWindow):
         self.url = ""
         self.url_entry.setText("")
 
+    def clear_fields(self):
+        self.clear_url()
+        self.output_filename = ""
+        self.refresh_filename_label()
+        self.refresh_insert_button()
+
     def choose_output_filename(self):
         initial_dir = str(Path.home())
         self.output_filename = QFileDialog.getSaveFileName(
@@ -72,6 +78,9 @@ class MemriseScraper(QMainWindow):
     def insert(self):
         word_pairs = self.scrape()
         self.write_to_file(word_pairs)
+        self.successful_message_box()
+        self.clear_fields()
+
 
     def scrape(self):
         """Scrapes the words from the given url"""
@@ -83,6 +92,7 @@ class MemriseScraper(QMainWindow):
 
         results = soup.find_all(lambda tag: tag.name == "div" and
                                        tag.get("class") == ["text"])
+        word_pairs = []
         it = iter(results)
         for element in it:
             tested_word = element.text
@@ -91,14 +101,33 @@ class MemriseScraper(QMainWindow):
         return word_pairs
 
     def write_to_file(self, word_pairs):
-        with open(self.output_filename) as out_file:
+        with open(self.output_filename, "w") as out_file:
             for pair in word_pairs:
-                line = pair[0] + self.separator + pair[1]
+                line = pair[0] + self.separator + pair[1] + "\n"
                 out_file.write(line)
 
     def close_window(self):
         """Closes the window"""
         self.close()
+
+    def message_box(self, title: str, message: str):
+        dlg = QMessageBox(self)
+        dlg.setWindowTitle(title)
+        dlg.setText(message)
+        button = dlg.exec_()
+
+    def successful_message_box(self):
+        title = "Success"
+        filtered_filename = self.filtered_filename()
+        message = "Words inserted successfully"
+        self.message_box(title, message)
+
+    def unsuccessful_message_box(self):
+        title =  "Error"
+        message = "Something bad happened :("
+        self.message_box(title, message)
+
+
 
 
 if __name__ == "__main__":

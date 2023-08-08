@@ -22,6 +22,7 @@ class MemriseScraper(QMainWindow):
         self.url = ""
         self.separator = ","
         self.output_filename = ""
+        self.word_pairs = []
         self.connect_widgets()
         self.refresh_widgets()
 
@@ -29,7 +30,7 @@ class MemriseScraper(QMainWindow):
         self.url_entry.textChanged.connect(self.url_entry_changed)
         self.clear_button.clicked.connect(self.clear_url)
         self.browse_button.clicked.connect(self.choose_output_filename)
-        self.separator_box
+#TODO        self.separator_box
         self.insert_button.clicked.connect(self.insert)
         self.cancel_button.clicked.connect(self.close_window)
 
@@ -78,39 +79,49 @@ class MemriseScraper(QMainWindow):
 
     def insert(self):
         if self.url and self.output_filename:
-            self.scrape_pages()
-            self.write_to_file(self.word_pairs)
-            self.successful_message_box()
-            self.reset()
+            try:
+                self.scrape_pages()
+            except ValueError:
+                self.unsuccessful_message_box()    
+            else:
+                self.write_to_file()
+                self.successful_message_box()
+            finally: 
+                self.reset()
+
+    def clean_url(self):
+        """Returns a url without an ending slash"""
+        if self.url[-1] == "/":
+            return self.url[:-1]
+        return self.url
 
     def scrape_pages(self):
         """Attempts scrapes on course homepage and subsequent pages"""
+        url = self.clean_url()
         try:
-            self.scrape_individual_page(self.url)
+            self.scrape_individual_page(url)
         except ValueError:
-            # It's either a multipage or non-existant
+            raise ValueError
+        else:
             current_page = 1
-            while True:
-                url = self.url + str(current_page) + "/"
+            multipage_url = url
+            while current_page < 10:
+                new_url = url + "/" + str(current_page) + "/"
                 try:
-                    self.scrape_individual_page(url)
-                except ValueError:
-                    if current_page == 1:
-                        raise ValueError
-                    else:
-                        return    # Run out of pages to scrape
+                    self.scrape_individual_page(new_url)
+                except:
+                    return    # Run out of pages to scrape
                 else:
                     current_page += 1
-        else:
-            pass    # Nothing more to do for single course pages
 
-    def scrape_individual_page(self):
+    def scrape_individual_page(self, url):
         """Scrapes the words from the given url"""
         try:
             page = urlopen(url)
         except ValueError:
             raise ValueError
         else:
+            print("Scraping", url)
             html = page.read().decode("utf-8")
             soup = BeautifulSoup(html, "html.parser")
             results = soup.find_all(lambda tag: tag.name == "div" and
@@ -145,7 +156,7 @@ class MemriseScraper(QMainWindow):
 
     def unsuccessful_message_box(self):
         title =  "Error"
-        message = "Something bad happened :("
+        message = "Scraping failed. Please check the URL"
         self.message_box(title, message)
 
 

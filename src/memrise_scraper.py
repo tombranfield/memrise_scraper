@@ -61,6 +61,8 @@ class MemriseScraper:
 if __name__ == "__main__":
 
     rocks_url = "https://app.memrise.com/course/2158097/chemistry-of-rocks-and-minerals/"
-    my_scraper = MemriseScraper(rocks_url)
+    wrong_url = "gibberish"
+
+    my_scraper = MemriseScraper(wrong_url)
     rocks = my_scraper.scrape()
     print(rocks)

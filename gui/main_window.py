@@ -74,6 +74,20 @@ class Main(QMainWindow):
     def separator_changed(self, separator):
         self.separator = separator
 
+    def disable_buttons(self):
+        self.insert_button.setEnabled(False)
+        self.browse_button.setEnabled(False)
+        self.clear_button.setEnabled(False)
+        self.url_entry.setEnabled(False)
+        self.separator_box.setEnabled(False)
+
+    def enable_buttons(self):
+        self.insert_button.setEnabled(True)
+        self.browse_button.setEnabled(True)
+        self.clear_button.setEnabled(True)
+        self.url_entry.setEnabled(True)
+        self.separator_box.setEnabled(True)
+
     def reset(self):
         self.clear_url_box()
         self.output_filename = ""
@@ -110,6 +124,7 @@ class Main(QMainWindow):
     def insert(self):
         if self.url and self.output_filename:
             self.status_label.setText("Scraping...")
+            self.disable_buttons()
             self.scrape()
 
     def scrape(self):
@@ -127,6 +142,7 @@ class Main(QMainWindow):
         self.status_label.setText("")
         self.write_to_file()
         self.reset()
+        self.enable_buttons()
         self.successful_message_box()
 
     def write_to_file(self):

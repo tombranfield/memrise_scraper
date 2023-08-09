@@ -26,13 +26,11 @@ class MemriseScraper:
                 new_url = url + "/" + str(current_page) + "/"
                 num_words_before = len(word_pairs)
                 word_pairs.extend(self._scrape_individual_page(new_url))
-                print(word_pairs)
                 num_words_after = len(word_pairs)
                 if num_words_before == num_words_after:
-                    return
+                    return word_pairs
                 print("Scraping page", current_page)
                 current_page += 1
-            return word_pairs
 
     def _scrape_individual_page(self, url):
         """Scrapes the words from the given url"""

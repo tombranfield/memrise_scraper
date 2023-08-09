@@ -14,7 +14,12 @@ from PyQt5.QtWidgets import (
     QMessageBox,
 )
 
-class MemriseScraper(QMainWindow):
+from file_writer import FileWriter
+from memrise_scraper import MemriseScraper
+
+
+
+class Main(QMainWindow):
     def __init__(self):
         super().__init__()
         uic.loadUi(str(Path(__file__).parents[1] / "gui" / "main_window.ui"), self)
@@ -143,10 +148,8 @@ class MemriseScraper(QMainWindow):
                 self.word_pairs.append((tested_word, english_word))
 
     def write_to_file(self):
-        with open(self.output_filename, "w") as out_file:
-            for pair in self.word_pairs:
-                line = pair[0] + self.separator + pair[1] + "\n"
-                out_file.write(line)
+        file_writer = FileWriter(self.word_pairs, self.separator, self.output_filename)
+        file_writer.write_to_file() 
 
     def close_window(self):
         """Closes the window"""
@@ -173,6 +176,6 @@ class MemriseScraper(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = MemriseScraper()
+    window = Main()
     window.show()
     app.exec_()

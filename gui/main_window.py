@@ -14,7 +14,7 @@ from PyQt5.QtWidgets import (
     QMessageBox,
 )
 
-from file_writer import FileWriter
+from .src.file_writer import FileWriter
 from memrise_scraper import MemriseScraper
 
 

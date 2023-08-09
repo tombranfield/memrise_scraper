@@ -1,6 +1,7 @@
 """worker.py"""
 
-
+import sys
+import time
 import traceback
 
 from PyQt5.QtCore import (
@@ -16,7 +17,7 @@ from src.memrise_scraper import MemriseScraper
 class WorkerSignals(QObject):
     result = pyqtSignal(object)
     finished = pyqtSignal()
-    error = pyQtSignal(tuple)
+    error = pyqtSignal(tuple)
 
 
 class ScraperWorker(QRunnable):
@@ -27,14 +28,11 @@ class ScraperWorker(QRunnable):
         self.kwargs = kwargs
         self.signals = WorkerSignals()
 
-
     @pyqtSlot()
     def run(self):
+        word_pairs = []
+        scraper = MemriseScraper(self.url)
         try:
-            """
-            result = self.fn(*self.args, **self.kwargs)
-            """
-            scraper = MemriseScraper(self.url)
             word_pairs = scraper.scrape()
         except:
             traceback.print_exc()
@@ -46,3 +44,4 @@ class ScraperWorker(QRunnable):
             self.signals.result.emit(word_pairs)
         finally:
             self.signals.finished.emit()
+            

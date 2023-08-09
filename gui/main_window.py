@@ -7,6 +7,8 @@ from urllib.request import urlopen
 import sys
 
 from PyQt5 import QtWidgets, uic
+from PyQt5.QtCore import QThreadPool
+
 from PyQt5.QtWidgets import (
     QApplication, 
     QFileDialog, 
@@ -17,7 +19,7 @@ from PyQt5.QtWidgets import (
 from src.file_writer import FileWriter
 from src.memrise_scraper import MemriseScraper
 
-from src.worker import Worker
+from gui.scraper_worker import ScraperWorker
 
 
 class Main(QMainWindow):
@@ -36,7 +38,7 @@ class Main(QMainWindow):
         self.separator = self.separator_box.currentText()
         self.status_label.setText("")
         self.url_entry.textChanged.connect(self.url_entry_changed)
-        self.clear_button.clicked.connect(self.clear_url)
+        self.clear_button.clicked.connect(self.clear_url_box)
         self.browse_button.clicked.connect(self.choose_output_filename)
         self.separator_box.currentTextChanged.connect(self.separator_changed)
         self.insert_button.clicked.connect(self.insert)
@@ -64,7 +66,7 @@ class Main(QMainWindow):
         self.url = url_entry_string
         self.refresh_insert_button()
 
-    def clear_url(self):
+    def clear_url_box(self):
         """Clears the url"""
         self.url = ""
         self.url_entry.setText("")
@@ -73,7 +75,7 @@ class Main(QMainWindow):
         self.separator = separator
 
     def reset(self):
-        self.clear_url()
+        self.clear_url_box()
         self.output_filename = ""
         self.refresh_filename_label()
         self.refresh_insert_button()
@@ -90,10 +92,12 @@ class Main(QMainWindow):
         self.refresh_filename_label()
         self.refresh_insert_button()
 
+    """
     def insert(self):
         if self.url and self.output_filename:
             try:
                 self.scrape()
+                print("after self.scrape()")
             except ValueError:
                 self.unsuccessful_message_box()    
             else:
@@ -101,21 +105,29 @@ class Main(QMainWindow):
                 self.successful_message_box()
             finally: 
                 self.reset()
+    """
 
-    def clean_url(self):
-        """Returns a url without an ending slash"""
-        if self.url[-1] == "/":
-            return self.url[:-1]
-        return self.url
+    def insert(self):
+        if self.url and self.output_filename:
+            self.status_label.setText("Scraping...")
+            self.scrape()
 
     def scrape(self):
         """Attempts scrapes on course homepage and subsequent pages"""
+        scraper_worker = ScraperWorker(self.url)
+        scraper_worker.signals.result.connect(self.got_result)
+        scraper_worker.signals.finished.connect(self.thread_complete)
+        self.threadpool.start(scraper_worker)
 
-        """
-        scraper = MemriseScraper(self.url)
-        self.word_pairs = scraper.scrape()
-        """
+    def got_result(self, s):
+        self.word_pairs = s
 
+    def thread_complete(self):
+        print("THREAD COMPLETE")
+        self.status_label.setText("")
+        self.write_to_file()
+        self.reset()
+        self.successful_message_box()
 
     def write_to_file(self):
         file_writer = FileWriter(self.word_pairs, self.separator, self.output_filename)
@@ -124,6 +136,12 @@ class Main(QMainWindow):
     def close_window(self):
         """Closes the window"""
         self.close()
+
+    def clean_url(self):
+        """Returns a url without an ending slash"""
+        if self.url[-1] == "/":
+            return self.url[:-1]
+        return self.url
 
     def message_box(self, title: str, message: str):
         dlg = QMessageBox(self)

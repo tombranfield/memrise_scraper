@@ -17,6 +17,7 @@ from PyQt5.QtWidgets import (
 from src.file_writer import FileWriter
 from src.memrise_scraper import MemriseScraper
 
+from src.worker import Worker
 
 
 class Main(QMainWindow):
@@ -29,6 +30,7 @@ class Main(QMainWindow):
         self.word_pairs = []
         self.setup_widgets()
         self.refresh_widgets()
+        self.threadpool = QThreadPool()
 
     def setup_widgets(self):
         self.separator = self.separator_box.currentText()
@@ -108,8 +110,12 @@ class Main(QMainWindow):
 
     def scrape(self):
         """Attempts scrapes on course homepage and subsequent pages"""
+
+        """
         scraper = MemriseScraper(self.url)
         self.word_pairs = scraper.scrape()
+        """
+
 
     def write_to_file(self):
         file_writer = FileWriter(self.word_pairs, self.separator, self.output_filename)

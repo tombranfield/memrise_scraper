@@ -3,13 +3,14 @@
 
 import traceback
 
-
 from PyQt5.QtCore import (
     QObject,
     QRunnable,
     pyqtSignal,
     pyqtSlot,
 )
+
+from src.memrise_scraper import MemriseScraper
 
 
 class WorkerSignals(QObject):
@@ -18,10 +19,10 @@ class WorkerSignals(QObject):
     error = pyQtSignal(tuple)
 
 
-class Worker(QRunnable):
-    def __init__(self, fn, *args, **kwargs):
+class ScraperWorker(QRunnable):
+    def __init__(self, url, *args, **kwargs):
         super().__init__()
-        self.fn = fn
+        self.url = url
         self.args = args
         self.kwargs = kwargs
         self.signals = WorkerSignals()
@@ -30,7 +31,11 @@ class Worker(QRunnable):
     @pyqtSlot()
     def run(self):
         try:
+            """
             result = self.fn(*self.args, **self.kwargs)
+            """
+            scraper = MemriseScraper(self.url)
+            word_pairs = scraper.scrape()
         except:
             traceback.print_exc()
             exctype, value = sys.exc.info()[:2]
@@ -38,6 +43,6 @@ class Worker(QRunnable):
                 (exctype, value, traceback.format_exc())
             )
         else:
-            self.signals.result.emit(result)
+            self.signals.result.emit(word_pairs)
         finally:
             self.signals.finished.emit()

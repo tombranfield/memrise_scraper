@@ -5,9 +5,13 @@ from bs4 import BeautifulSoup
 from pathlib import Path
 from urllib.request import urlopen
 import sys
+import time
 
 from PyQt5 import QtWidgets, uic
-from PyQt5.QtCore import QThreadPool
+from PyQt5.QtCore import (
+    QThreadPool,
+    QTimer,
+)
 
 from PyQt5.QtWidgets import (
     QApplication, 
@@ -33,6 +37,15 @@ class Main(QMainWindow):
         self.setup_widgets()
         self.refresh_widgets()
         self.threadpool = QThreadPool()
+        self.is_scraping = False
+        self.setup_timer()
+
+
+    def setup_timer(self):
+        self.timer = QTimer()
+        self.timer.setInterval(100)
+        self.timer.timeout.connect(self.update_status_label)
+        self.timer.start()
 
     def setup_widgets(self):
         self.separator = self.separator_box.currentText()
@@ -89,13 +102,14 @@ class Main(QMainWindow):
         self.separator_box.setEnabled(True)
 
     def reset(self):
+        self.enable_buttons()
         self.clear_url_box()
         self.output_filename = ""
         self.refresh_filename_label()
         self.refresh_insert_button()
         self.separator_box.setCurrentIndex(0)
         self.word_pairs = []
-        self.status_label.setText("")
+        self.status = ""
 
     def choose_output_filename(self):
         initial_dir = str(Path.home())
@@ -123,7 +137,8 @@ class Main(QMainWindow):
 
     def insert(self):
         if self.url and self.output_filename:
-            self.status_label.setText("Scraping...")
+        #    self.status_label.setText("Scraping...")
+            self.is_scraping = True
             self.disable_buttons()
             self.scrape()
 
@@ -139,11 +154,28 @@ class Main(QMainWindow):
 
     def thread_complete(self):
         print("THREAD COMPLETE")
-        self.status_label.setText("")
+        self.is_scraping = False
         self.write_to_file()
         self.reset()
         self.enable_buttons()
         self.successful_message_box()
+
+    def update_status_label(self):
+        if self.is_scraping:
+#            self.status_label.setText("scraping!")
+            count = 0
+            while self.is_scraping:
+                
+                msg = "Scraping" + count * "."
+                print(msg)
+                self.status_label.setText(msg)
+                time.sleep(1)
+                if count < 3: count += 1
+                else:
+                    count = 0
+
+        else:
+            self.status_label.setText("")
 
     def write_to_file(self):
         file_writer = FileWriter(self.word_pairs, self.separator, self.output_filename)

@@ -119,7 +119,7 @@ class MemriseScraper(QMainWindow):
                 num_words_after = len(self.word_pairs)
                 if num_words_before == num_words_after:
                     return
-#                print("Scraping page", current_page)
+                print("Scraping page", current_page)
                 msg = "Scraping page " + str(current_page)
                 self.status_label.setText(msg)
                 current_page += 1

@@ -29,7 +29,6 @@ class MemriseScraper:
                 num_words_after = len(word_pairs)
                 if num_words_before == num_words_after:
                     return word_pairs
-                print("Scraping page", current_page)
                 current_page += 1
 
     def _scrape_individual_page(self, url):

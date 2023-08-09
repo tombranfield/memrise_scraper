@@ -1,4 +1,4 @@
-"""memrise_scraper.py"""
+"""main.py"""
 
 
 from bs4 import BeautifulSoup
@@ -17,8 +17,8 @@ from PyQt5.QtWidgets import (
 class MemriseScraper(QMainWindow):
     def __init__(self):
         super().__init__()
-        uic.loadUi(str(Path(__file__).parents[0] / "main_window.ui"), self)
-        self.setStyleSheet(open(str(Path("stylesheet.css"))).read())
+        uic.loadUi(str(Path(__file__).parents[1] / "gui" / "main_window.ui"), self)
+        self.setStyleSheet(open( str(Path(__file__).parents[1] / "gui" / "stylesheet.css")) .read())
         self.url = ""
         self.output_filename = ""
         self.word_pairs = []

@@ -4,6 +4,7 @@
 from bs4 import BeautifulSoup
 from pathlib import Path
 from urllib.request import urlopen
+import random
 import sys
 import time
 
@@ -162,21 +163,12 @@ class Main(QMainWindow):
 
     def update_status_label(self):
         if self.is_scraping:
-#            self.status_label.setText("scraping!")
-            count = 0
-            while self.is_scraping:
-                
-                msg = "Scraping" + count * "."
-                print(msg)
-                self.status_label.setText(msg)
-                time.sleep(1)
-                if count < 3: count += 1
-                else:
-                    count = 0
-
+            r = random.randint(1, 4)
+            msg = r * "." + "Scraping" + r * "."
+            self.status_label.setText(msg)
         else:
             self.status_label.setText("")
-
+                
     def write_to_file(self):
         file_writer = FileWriter(self.word_pairs, self.separator, self.output_filename)
         file_writer.write_to_file() 

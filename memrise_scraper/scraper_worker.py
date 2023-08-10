@@ -17,8 +17,8 @@ from memrise_scraper import MemriseScraper
 class WorkerSignals(QObject):
     result = pyqtSignal(object)
     finished = pyqtSignal()
-#    error = pyqtSignal(tuple)
     error = pyqtSignal()
+
 
 class ScraperWorker(QRunnable):
     def __init__(self, url, *args, **kwargs):
@@ -33,22 +33,9 @@ class ScraperWorker(QRunnable):
         word_pairs = []
         scraper = MemriseScraper(self.url)
         try:
-            word_pairs = scraper.scrape()
+            word_pairs = scraper.scrape()            
         except:
-            """
-            print("an error occured")
-            traceback.print_exc()
-            print("done traceback")
-            exctype, value = sys.exc.info()[:2]
-            print("unpacked tuple")
-            
-            self.signals.error.emit(
-                (exctype, value, traceback.format_exc())
-            )
-            """
             self.signals.error.emit()
         else:
             self.signals.result.emit(word_pairs)
             self.signals.finished.emit()
-#        finally:
-            

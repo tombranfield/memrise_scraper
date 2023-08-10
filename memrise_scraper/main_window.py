@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 from pathlib import Path
 from urllib.request import urlopen
 import random
+import os
 import sys
 import time
 
@@ -39,7 +40,6 @@ class Main(QMainWindow):
         self.threadpool = QThreadPool()
         self.is_scraping = False
         self.setup_timer()
-
 
     def setup_timer(self):
         self.timer = QTimer()
@@ -120,21 +120,6 @@ class Main(QMainWindow):
         self.refresh_filename_label()
         self.refresh_insert_button()
 
-    """
-    def insert(self):
-        if self.url and self.output_filename:
-            try:
-                self.scrape()
-                print("after self.scrape()")
-            except ValueError:
-                self.unsuccessful_message_box()    
-            else:
-                self.write_to_file()
-                self.successful_message_box()
-            finally: 
-                self.reset()
-    """
-
     def insert(self):
         if self.url and self.output_filename:
             self.is_scraping = True
@@ -161,7 +146,6 @@ class Main(QMainWindow):
         self.successful_message_box()
 
     def scraper_error(self):
-        print("in scraper error")
         self.is_scraping = False
         self.reset()
         self.unsuccessful_message_box()
@@ -170,7 +154,7 @@ class Main(QMainWindow):
     def update_status_label(self):
         if self.is_scraping:
             r = random.randint(1, 4)
-            msg = r * "." + "Scraping" + r * "."
+            msg = r * "." + "Scraping" + (r + 1) * "."
             self.status_label.setText(msg)
         else:
             self.status_label.setText("")
@@ -181,7 +165,7 @@ class Main(QMainWindow):
 
     def close_window(self):
         """Closes the window"""
-        self.close()
+        os._exit(1)
 
     def clean_url(self):
         """Returns a url without an ending slash"""

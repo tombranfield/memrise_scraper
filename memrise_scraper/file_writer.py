@@ -7,9 +7,10 @@ class FileWriter:
         self.word_pairs = word_pairs
         self.separator = separator
         self.output_filename = output_filename
-        
+
     def write_to_file(self):
-        with open(self.output_filename, "w") as out_file:
+        """Writes the word pairs to the file"""
+        with open(self.output_filename, "w", encoding="utf-8") as out_file:
             for pair in self.word_pairs:
                 line = pair[0] + self.separator + pair[1] + "\n"
                 out_file.write(line)

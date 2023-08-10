@@ -1,8 +1,5 @@
 """worker.py"""
 
-import sys
-import time
-import traceback
 
 from PyQt5.QtCore import (
     QObject,
@@ -15,12 +12,14 @@ from memrise_scraper import MemriseScraper
 
 
 class WorkerSignals(QObject):
+    """Signals for the worker"""
     result = pyqtSignal(object)
     finished = pyqtSignal()
     error = pyqtSignal()
 
 
 class ScraperWorker(QRunnable):
+    """A worker that handles scraping"""
     def __init__(self, url, *args, **kwargs):
         super().__init__()
         self.url = url

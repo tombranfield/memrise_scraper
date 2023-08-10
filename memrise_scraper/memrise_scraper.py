@@ -1,8 +1,9 @@
 """memrise_scraper.py"""
 
 
-from bs4 import BeautifulSoup
 from urllib.request import urlopen
+
+from bs4 import BeautifulSoup
 
 
 class MemriseScraper:
@@ -19,7 +20,7 @@ class MemriseScraper:
         except ValueError:
             raise ValueError
         else:
-            if len(word_pairs) > 0: 
+            if len(word_pairs) > 0:
                 return word_pairs
             current_page = 1
             while True:
@@ -43,10 +44,10 @@ class MemriseScraper:
             results = soup.find_all(lambda tag: tag.name == "div" and
                                        tag.get("class") == ["text"])
             word_pairs = []
-            it = iter(results)
-            for element in it:
+            results_iterable = iter(results)
+            for element in results_iterable:
                 tested_word = element.text
-                english_word = next(it).text
+                english_word = next(results_iterable).text
                 word_pairs.append((tested_word, english_word))
             return word_pairs
 
@@ -55,13 +56,3 @@ class MemriseScraper:
         if url[-1] == "/":
             return url[:-1]
         return url
-
-
-if __name__ == "__main__":
-
-    rocks_url = "https://app.memrise.com/course/2158097/chemistry-of-rocks-and-minerals/"
-    wrong_url = "gibberish"
-
-    my_scraper = MemriseScraper(wrong_url)
-    rocks = my_scraper.scrape()
-    print(rocks)

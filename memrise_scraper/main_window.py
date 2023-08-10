@@ -137,7 +137,6 @@ class Main(QMainWindow):
 
     def insert(self):
         if self.url and self.output_filename:
-        #    self.status_label.setText("Scraping...")
             self.is_scraping = True
             self.disable_buttons()
             self.scrape()
@@ -145,11 +144,12 @@ class Main(QMainWindow):
     def scrape(self):
         """Attempts scrapes on course homepage and subsequent pages"""
         scraper_worker = ScraperWorker(self.url)
-        scraper_worker.signals.result.connect(self.got_result)
+        scraper_worker.signals.result.connect(self.scraper_result)
         scraper_worker.signals.finished.connect(self.thread_complete)
+        scraper_worker.signals.error.connect(self.scraper_error)
         self.threadpool.start(scraper_worker)
 
-    def got_result(self, s):
+    def scraper_result(self, s):
         self.word_pairs = s
 
     def thread_complete(self):
@@ -159,6 +159,13 @@ class Main(QMainWindow):
         self.reset()
         self.enable_buttons()
         self.successful_message_box()
+
+    def scraper_error(self):
+        print("in scraper error")
+        self.is_scraping = False
+        self.reset()
+        self.unsuccessful_message_box()
+        self.enable_buttons()
 
     def update_status_label(self):
         if self.is_scraping:

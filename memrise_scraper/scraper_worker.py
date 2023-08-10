@@ -11,7 +11,7 @@ from PyQt5.QtCore import (
     pyqtSlot,
 )
 
-from src.memrise_scraper import MemriseScraper
+from memrise_scraper import MemriseScraper
 
 
 class WorkerSignals(QObject):

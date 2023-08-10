@@ -21,17 +21,16 @@ from PyQt5.QtWidgets import (
     QMessageBox,
 )
 
-from src.file_writer import FileWriter
-from src.memrise_scraper import MemriseScraper
-
-from gui.scraper_worker import ScraperWorker
+from file_writer import FileWriter
+from memrise_scraper import MemriseScraper
+from scraper_worker import ScraperWorker
 
 
 class Main(QMainWindow):
     def __init__(self):
         super().__init__()
-        uic.loadUi(str(Path(__file__).parents[1] / "gui" / "main_window.ui"), self)
-        self.setStyleSheet(open( str(Path(__file__).parents[1] / "gui" / "stylesheet.css")) .read())
+        uic.loadUi(str(Path(__file__).parents[0] / "main_window.ui"), self)
+        self.setStyleSheet(open( str(Path(__file__).parents[0] / "stylesheet.css")) .read())
         self.url = ""
         self.output_filename = ""
         self.word_pairs = []
